@@ -1,0 +1,17 @@
+# Ignorer les fichiers de compilation
+target/
+*.class
+
+# Ignorer les fichiers de configuration IDE
+*.iml
+.idea/
+.vscode/
+
+# Ignorer Maven et logs
+mvnw
+mvnw.cmd
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.next
+release.properties
+log/
