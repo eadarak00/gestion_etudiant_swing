@@ -227,6 +227,7 @@ public class MainFrame extends JFrame {
         // les actionners
         ajouter.addActionListener(e -> ajouterEtudiant());
         supprimer.addActionListener(e -> supprimerEtudiant());
+        modifier.addActionListener(e -> modifierEtudiant());
 
         return panelLeft;
     }
@@ -349,9 +350,10 @@ public class MainFrame extends JFrame {
             String prenom = etudiantTable.getValueAt(selectedRow, 2).toString();
             String nom = etudiantTable.getValueAt(selectedRow, 3).toString();
 
-            String message = String.format("Voulez-vous vraiment supprimer cet étudiant %d [ (%s) %s - %s ]?", id, ine, prenom, nom);
+            String message = String.format("Voulez-vous vraiment supprimer cet étudiant %d [ (%s) %s - %s ]?", id, ine,
+                    prenom, nom);
             // Confirmation de suppression
-            int confirm = JOptionPane.showConfirmDialog(this,message,
+            int confirm = JOptionPane.showConfirmDialog(this, message,
                     "Confirmation", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
@@ -378,5 +380,69 @@ public class MainFrame extends JFrame {
         DefaultTableModel model = new DefaultTableModel(data, column);
         etudiantTable.setModel(model);
     }
+
+    public void modifierEtudiant() {
+        int selectedRow = etudiantTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            String idString = etudiantTable.getValueAt(selectedRow, 0).toString();
+            int id = Integer.parseInt(idString);
+    
+            String ine = ine_input.getText();
+            String nom = nom_input.getText();
+            String prenom = prenom_input.getText();
+            Sexe sexe = homme.isSelected() ? Sexe.MASCULIN : Sexe.FEMININ;
+            String naiss = naiss_input.getText().trim(); // Récupérer la date sous forme de String
+            LocalDate dateNaiss = null;
+    
+            try {
+                // Convertir la chaîne en LocalDate en spécifiant le format
+                dateNaiss = LocalDate.parse(naiss);
+            } catch (DateTimeParseException e) {
+                // Gérer l'erreur si la date est invalide
+                JOptionPane.showMessageDialog(this, "Date invalide. Veuillez entrer la date au format yyyy-MM-dd.");
+                return;
+            }
+    
+            Filiere filiere = filiereService.findByLibelle((String) filiereBox.getSelectedItem());
+            Integer niveau = (Integer) niv_box.getSelectedItem();
+    
+            if (ine.isEmpty() || nom.isEmpty() || prenom.isEmpty() || naiss.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs", "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                Etudiant etudiant = new Etudiant();
+                etudiant.setIne(ine);
+                etudiant.setPrenom(prenom);
+                etudiant.setNom(nom);
+                etudiant.setNiveau(niveau);
+                etudiant.setSexe(sexe);
+                etudiant.setFiliere(filiere);
+                etudiant.setDateNaiss(dateNaiss);
+    
+                // Message de confirmation pour la modification
+                String message = String.format("Voulez-vous vraiment modifier cet étudiant %d ?", id);
+                // Confirmation de modification
+                int confirm = JOptionPane.showConfirmDialog(this, message,
+                        "Confirmation", JOptionPane.YES_NO_OPTION);
+    
+                if (confirm == JOptionPane.YES_OPTION) {
+                    // Modification dans la base de données ou la liste des étudiants
+                    etudiantService.modifier(id, etudiant);
+    
+                    // Mise à jour du tableau
+                    rafraichirTableau();
+    
+                    // Réinitialisation du formulaire
+                    reinitialiserFormulaire();
+    
+                    JOptionPane.showMessageDialog(this, "Étudiant modifié avec succès.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un étudiant à modifier.", "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
 
 }
