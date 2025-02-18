@@ -16,10 +16,21 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+    /**
+ * Classe MainFrame représentant l'interface principale de l'application de gestion 
+ * du club étudiant.
+ * 
+ * Cette fenêtre inclut :
+ * - Un formulaire d'inscription des étudiants sur le panneau gauche.
+ * - Une table affichant la liste des étudiants sur le panneau droit.
+ * 
+ * @author [eadarak00]
+ * @version 1.0
+ * @since [18.02.2025]
+ */
 public class MainFrame extends JFrame {
     private FiliereService filiereService;
     private EtudiantService etudiantService;
-    // Déclaration des variables pour chaque champ
     private JTextField id_input;
     private JTextField ine_input;
     private JTextField nom_input;
@@ -30,6 +41,7 @@ public class MainFrame extends JFrame {
     private JComboBox<String> filiereBox;
     private JComboBox<Integer> niv_box;
     private JTable etudiantTable;
+
 
     public MainFrame() throws Exception {
         this.filiereService = new FiliereService();
@@ -60,6 +72,47 @@ public class MainFrame extends JFrame {
         mainPanel.add(createRightPanel(), BorderLayout.CENTER);
     }
 
+    /**
+ * Crée et configure le panneau gauche de l'interface utilisateur.
+ * <p>
+ * Ce panneau contient un formulaire permettant l'ajout, la modification et la suppression 
+ * d'étudiants. Il comprend plusieurs champs d'entrée, des boutons d'action et une 
+ * interface utilisateur bien organisée.
+ * </p>
+ *
+ * <h3>Composants du panneau :</h3>
+ * <ul>
+ *   <li>Un titre : "Formulaire d'inscription" en haut du panneau.</li>
+ *   <li>Un formulaire structuré avec des champs pour :
+ *     <ul>
+ *       <li>INE</li>
+ *       <li>Nom</li>
+ *       <li>Prénom</li>
+ *       <li>Date de naissance (au format yyyy-MM-dd)</li>
+ *       <li>Sexe (Homme / Femme)</li>
+ *       <li>Filière (liste déroulante alimentée dynamiquement)</li>
+ *       <li>Niveau (1, 2 ou 3)</li>
+ *     </ul>
+ *   </li>
+ *   <li>Un panneau de boutons contenant :
+ *     <ul>
+ *       <li>Un bouton "Ajouter" pour enregistrer un nouvel étudiant.</li>
+ *       <li>Un bouton "Supprimer" pour retirer un étudiant sélectionné.</li>
+ *       <li>Un bouton "Modifier" pour mettre à jour les informations d'un étudiant existant.</li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ *
+ * <h3>Fonctionnalités :</h3>
+ * <ul>
+ *   <li>Utilisation d'un {@code GridBagLayout} pour organiser les champs du formulaire.</li>
+ *   <li>Utilisation d'un {@code ButtonGroup} pour gérer la sélection du sexe.</li>
+ *   <li>Affichage dynamique des filières à partir du service {@code filiereService}.</li>
+ *   <li>Gestion des actions sur les boutons (ajout, suppression et modification).</li>
+ * </ul>
+ *
+ * @return Un {@code JPanel} contenant le formulaire d'inscription des étudiants.
+ */
     private JPanel createLeftPanel() {
         // Panneau gauche
         JPanel panelLeft = new JPanel();
@@ -232,6 +285,46 @@ public class MainFrame extends JFrame {
         return panelLeft;
     }
 
+    /**
+     * Crée et configure le panneau droit de l'interface utilisateur.
+     * <p>
+     * Ce panneau contient un tableau affichant la liste des étudiants avec leurs
+     * informations.
+     * Les étudiants sont récupérés depuis le service et affichés sous forme de
+     * tableau.
+     * Un {@code JScrollPane} est utilisé pour permettre le défilement lorsque les
+     * données sont nombreuses.
+     * </p>
+     *
+     * <h3>Composants du panneau :</h3>
+     * <ul>
+     * <li>Un {@code JTable} affichant la liste des étudiants avec les colonnes
+     * suivantes :
+     * <ul>
+     * <li># (Identifiant de l'étudiant)</li>
+     * <li>INE (Numéro d'identification de l'étudiant)</li>
+     * <li>Prénom</li>
+     * <li>Nom</li>
+     * <li>Date de naissance</li>
+     * <li>Sexe</li>
+     * <li>Filière</li>
+     * <li>Niveau</li>
+     * </ul>
+     * </li>
+     * <li>Un {@code JScrollPane} permettant de gérer le défilement des données du
+     * tableau.</li>
+     * </ul>
+     *
+     * <h3>Fonctionnalités :</h3>
+     * <ul>
+     * <li>Affichage dynamique des étudiants en utilisant un
+     * {@code DefaultTableModel}.</li>
+     * <li>Déclenchement automatique du remplissage du formulaire lorsque
+     * l'utilisateur clique sur une ligne du tableau.</li>
+     * </ul>
+     *
+     * @return Un {@code JPanel} contenant le tableau des étudiants.
+     */
     private JPanel createRightPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -257,6 +350,36 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
+    /**
+     * Ajoute un nouvel étudiant à la base de données ou à la liste d'étudiants.
+     * <p>
+     * Cette méthode récupère les informations saisies dans le formulaire,
+     * les valide, puis crée un nouvel objet {@code Etudiant} avant de l'ajouter via
+     * le service correspondant. Une fois l'ajout effectué, elle met à jour
+     * l'affichage
+     * et réinitialise le formulaire.
+     * </p>
+     *
+     * <h3>Étapes du processus :</h3>
+     * <ol>
+     * <li>Récupération et validation des champs du formulaire.</li>
+     * <li>Conversion de la date de naissance en {@code LocalDate}.</li>
+     * <li>Vérification des champs obligatoires.</li>
+     * <li>Création et initialisation d'un objet {@code Etudiant}.</li>
+     * <li>Ajout de l'étudiant via
+     * {@code etudiantService.ajouterEtudiant(etudiant)}.</li>
+     * <li>Rafraîchissement du tableau des étudiants.</li>
+     * <li>Réinitialisation du formulaire.</li>
+     * <li>Affichage d'un message de confirmation.</li>
+     * </ol>
+     *
+     * <h3>Gestion des erreurs :</h3>
+     * <ul>
+     * <li>Si la date de naissance est invalide, une boîte de dialogue affiche un
+     * message d'erreur.</li>
+     * <li>Si un champ obligatoire est vide, un message d'erreur est affiché.</li>
+     * </ul>
+     */
     public void ajouterEtudiant() {
         String ine = ine_input.getText();
         String nom = nom_input.getText();
@@ -301,6 +424,20 @@ public class MainFrame extends JFrame {
         }
     }
 
+    /**
+     * Réinitialise le formulaire de saisie des étudiants.
+     * <p>
+     * Cette méthode vide les champs de saisie du formulaire et réinitialise
+     * les sélections aux valeurs par défaut. Elle effectue les actions suivantes :
+     * </p>
+     * <ul>
+     * <li>Efface le contenu des champs de texte (INE, nom, prénom, date de
+     * naissance).</li>
+     * <li>Déselectionne les boutons radio pour le sexe.</li>
+     * <li>Réinitialise la sélection des comboBox (filière et niveau) à leur premier
+     * élément.</li>
+     * </ul>
+     */
     private void reinitialiserFormulaire() {
         ine_input.setText("");
         nom_input.setText("");
@@ -312,6 +449,28 @@ public class MainFrame extends JFrame {
         niv_box.setSelectedIndex(0);
     }
 
+    /**
+     * Remplit le formulaire avec les données de l'étudiant sélectionné dans le
+     * tableau.
+     * <p>
+     * Cette méthode récupère les informations de l'étudiant sélectionné dans le
+     * tableau
+     * et les affecte aux champs correspondants du formulaire. Elle met à jour :
+     * </p>
+     * <ul>
+     * <li>L'ID de l'étudiant</li>
+     * <li>L'INE</li>
+     * <li>Le prénom</li>
+     * <li>Le nom</li>
+     * <li>La date de naissance</li>
+     * <li>Le sexe (en sélectionnant le bouton radio correspondant)</li>
+     * <li>La filière (en mettant à jour la comboBox)</li>
+     * <li>Le niveau (en mettant à jour la comboBox du niveau)</li>
+     * </ul>
+     * <p>
+     * Si aucune ligne n'est sélectionnée, la méthode ne fait rien.
+     * </p>
+     */
     private void remplirFormulaireDepuisTableau() {
         int selectedRow = etudiantTable.getSelectedRow();
         if (selectedRow >= 0) {
@@ -339,6 +498,26 @@ public class MainFrame extends JFrame {
         }
     }
 
+    /**
+     * Supprime l'étudiant sélectionné dans le tableau après confirmation.
+     * <p>
+     * Cette méthode vérifie si une ligne d'étudiant a été sélectionnée dans le
+     * tableau. Si c'est le cas,
+     * elle récupère les informations de l'étudiant (ID, INE, prénom et nom), puis
+     * affiche une boîte de
+     * dialogue pour demander à l'utilisateur de confirmer la suppression de
+     * l'étudiant.
+     * Si l'utilisateur confirme, l'étudiant est supprimé de la base de données via
+     * la méthode
+     * `etudiantService.supprimer()`. Le tableau est ensuite mis à jour et le
+     * formulaire réinitialisé.
+     * </p>
+     * <p>
+     * Si aucune ligne n'est sélectionnée, un message d'erreur est affiché pour
+     * inviter l'utilisateur à
+     * sélectionner un étudiant avant de procéder à la suppression.
+     * </p>
+     */
     private void supprimerEtudiant() {
         int selectedRow = etudiantTable.getSelectedRow();
 
@@ -373,6 +552,21 @@ public class MainFrame extends JFrame {
         }
     }
 
+    /**
+     * Rafraîchit le tableau des étudiants avec les données actuelles.
+     * <p>
+     * Cette méthode récupère les informations les plus récentes des étudiants en
+     * appelant la méthode
+     * `listerEtudiantsOnTable()` du service `etudiantService`. Ensuite, elle met à
+     * jour le modèle du
+     * tableau pour refléter ces données.
+     * </p>
+     * <p>
+     * Le tableau est composé de colonnes pour afficher l'ID, l'INE, le prénom, le
+     * nom, la date de naissance,
+     * le sexe, la filière, et le niveau de chaque étudiant.
+     * </p>
+     */
     private void rafraichirTableau() {
         String data[][] = etudiantService.listerEtudiantsOnTable();
         String column[] = { "#", "INE", "Prénom", "Nom", "Date Naissance", "Sexe", "Filière", "Niveau" };
@@ -381,19 +575,36 @@ public class MainFrame extends JFrame {
         etudiantTable.setModel(model);
     }
 
+    /**
+     * Permet de modifier les informations d'un étudiant sélectionné dans le
+     * tableau.
+     * Cette méthode récupère les données du formulaire, effectue une validation, et
+     * si tout est valide,
+     * elle modifie les informations de l'étudiant dans la base de données.
+     * <p>
+     * Si un étudiant est sélectionné dans le tableau, un message de confirmation
+     * est affiché pour
+     * valider l'action de modification. Si l'utilisateur confirme, l'étudiant est
+     * modifié dans la base
+     * de données et le tableau est mis à jour.
+     * </p>
+     * <p>
+     * Si aucun étudiant n'est sélectionné, un message d'erreur est affiché.
+     * </p>
+     */
     public void modifierEtudiant() {
         int selectedRow = etudiantTable.getSelectedRow();
         if (selectedRow >= 0) {
             String idString = etudiantTable.getValueAt(selectedRow, 0).toString();
             int id = Integer.parseInt(idString);
-    
+
             String ine = ine_input.getText();
             String nom = nom_input.getText();
             String prenom = prenom_input.getText();
             Sexe sexe = homme.isSelected() ? Sexe.MASCULIN : Sexe.FEMININ;
             String naiss = naiss_input.getText().trim(); // Récupérer la date sous forme de String
             LocalDate dateNaiss = null;
-    
+
             try {
                 // Convertir la chaîne en LocalDate en spécifiant le format
                 dateNaiss = LocalDate.parse(naiss);
@@ -402,10 +613,10 @@ public class MainFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Date invalide. Veuillez entrer la date au format yyyy-MM-dd.");
                 return;
             }
-    
+
             Filiere filiere = filiereService.findByLibelle((String) filiereBox.getSelectedItem());
             Integer niveau = (Integer) niv_box.getSelectedItem();
-    
+
             if (ine.isEmpty() || nom.isEmpty() || prenom.isEmpty() || naiss.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs", "Erreur",
                         JOptionPane.ERROR_MESSAGE);
@@ -418,23 +629,23 @@ public class MainFrame extends JFrame {
                 etudiant.setSexe(sexe);
                 etudiant.setFiliere(filiere);
                 etudiant.setDateNaiss(dateNaiss);
-    
+
                 // Message de confirmation pour la modification
                 String message = String.format("Voulez-vous vraiment modifier cet étudiant %d ?", id);
                 // Confirmation de modification
                 int confirm = JOptionPane.showConfirmDialog(this, message,
                         "Confirmation", JOptionPane.YES_NO_OPTION);
-    
+
                 if (confirm == JOptionPane.YES_OPTION) {
                     // Modification dans la base de données ou la liste des étudiants
                     etudiantService.modifier(id, etudiant);
-    
+
                     // Mise à jour du tableau
                     rafraichirTableau();
-    
+
                     // Réinitialisation du formulaire
                     reinitialiserFormulaire();
-    
+
                     JOptionPane.showMessageDialog(this, "Étudiant modifié avec succès.");
                 }
             }
@@ -443,6 +654,5 @@ public class MainFrame extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
-    
 
 }
