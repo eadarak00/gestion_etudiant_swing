@@ -28,13 +28,15 @@ public class MainFrame extends JFrame {
 
         // Ajouter le panneau gauche (créé par la méthode createLeftPanel())
         mainPanel.add(createLeftPanel(), BorderLayout.WEST);
+
+        mainPanel.add(createRightPanel(), BorderLayout.CENTER);
     }
 
     private JPanel createLeftPanel() {
         // Panneau gauche
         JPanel panelLeft = new JPanel();
         panelLeft.setLayout(new BorderLayout());
-        panelLeft.setPreferredSize(new Dimension(600, 0));
+        panelLeft.setPreferredSize(new Dimension(500, 0));
         panelLeft.setBackground(new Color(238, 238, 238));
 
         // Titre du formulaire
@@ -177,4 +179,26 @@ public class MainFrame extends JFrame {
 
         return panelLeft;
     }
+
+    private JPanel createRightPanel() {
+        // Créer un panneau avec un layout BorderLayout pour que le tableau occupe tout l'espace
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+    
+        // Données du tableau (vide dans ce cas)
+        String data[][] = {};
+        String column[] = {"INE", "Prénom", "Nom", "Date Naissance", "Sexe", "Filière", "Niveau"};
+        
+        // Création du tableau
+        JTable t = new JTable(data, column);
+        t.setBackground(new Color(255, 255, 255)); 
+        JScrollPane sp = new JScrollPane(t);
+    
+        // Ajouter le JScrollPane au panneau dans la zone CENTER
+        panel.add(sp, BorderLayout.CENTER);
+    
+        return panel;
+    }
+    
 }
