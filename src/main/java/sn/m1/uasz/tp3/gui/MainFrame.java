@@ -20,6 +20,7 @@ public class MainFrame extends JFrame {
     private FiliereService filiereService;
     private EtudiantService etudiantService;
     // Déclaration des variables pour chaque champ
+    private JTextField id_input;
     private JTextField ine_input;
     private JTextField nom_input;
     private JTextField prenom_input;
@@ -28,6 +29,7 @@ public class MainFrame extends JFrame {
     private JRadioButton femme;
     private JComboBox<String> filiereBox;
     private JComboBox<Integer> niv_box;
+    private JTable etudiantTable;
 
     public MainFrame() throws Exception {
         this.filiereService = new FiliereService();
@@ -78,6 +80,7 @@ public class MainFrame extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
+        // id_input.setVisible(false);
         // Ajouter l'input et label INE
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -187,6 +190,12 @@ public class MainFrame extends JFrame {
         niv_box.setFont(new Font("Arial", Font.PLAIN, 14));
         form.add(niv_box, gbc);
 
+        gbc.gridx = 1;
+        gbc.gridy = 7;
+        id_input = new JTextField(15);
+        id_input.setVisible(false);
+        form.add(id_input, gbc);
+
         // Ajouter le formulaire au panneau gauche
         panelLeft.add(form, BorderLayout.CENTER);
 
@@ -217,6 +226,7 @@ public class MainFrame extends JFrame {
 
         // les actionners
         ajouter.addActionListener(e -> ajouterEtudiant());
+        supprimer.addActionListener(e -> supprimerEtudiant());
 
         return panelLeft;
     }
@@ -227,55 +237,24 @@ public class MainFrame extends JFrame {
         panel.setBackground(Color.WHITE);
 
         // Créer un modèle de tableau par défaut pour gérer les données dynamiquement
-        String column[] = { "INE", "Prénom", "Nom", "Date Naissance", "Sexe", "Filière", "Niveau" };
+        String column[] = { "#", "INE", "Prénom", "Nom", "Date Naissance", "Sexe", "Filière", "Niveau" };
         DefaultTableModel model = new DefaultTableModel(etudiantService.listerEtudiantsOnTable(), column);
-        JTable t = new JTable(model);
-        t.setBackground(new Color(255, 255, 255));
-        JScrollPane sp = new JScrollPane(t);
+        etudiantTable = new JTable(model);
+        etudiantTable.setBackground(new Color(255, 255, 255));
+        JScrollPane sp = new JScrollPane(etudiantTable);
 
         // Ajouter le JScrollPane au panneau droit
         panel.add(sp, BorderLayout.CENTER);
 
+        etudiantTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                remplirFormulaireDepuisTableau();
+            }
+        });
+
         return panel;
     }
-
-    // Méthode pour ajouter un étudiant
-    // public void ajouterEtudiant() {
-    //     String ine = ine_input.getText();
-    //     String nom = nom_input.getText();
-    //     String prenom = prenom_input.getText();
-    //     Sexe sexe = homme.isSelected() ? Sexe.MASCULIN : Sexe.FEMININ;
-    //     String naiss = naiss_input.getText().trim(); // Récupérer la date sous forme de String
-    //     LocalDate dateNaiss = null;
-
-    //     try {
-    //         // Convertir la chaîne en LocalDate en spécifiant le format
-    //         dateNaiss = LocalDate.parse(naiss);
-    //     } catch (DateTimeParseException e) {
-    //         // Gérer l'erreur si la date est invalide
-    //         JOptionPane.showMessageDialog(this, "Date invalide. Veuillez entrer la date au format yyyy-MM-dd.");
-    //     }
-    //     Filiere filiere = filiereService.findByLibelle((String) filiereBox.getSelectedItem());
-    //     Integer niveau = (Integer) niv_box.getSelectedItem();
-
-    //     if (ine.isEmpty() || nom.isEmpty() || prenom.isEmpty() || naiss.isEmpty()) {
-    //         JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs", "Erreur",
-    //                 JOptionPane.ERROR_MESSAGE);
-    //     } else {
-    //         Etudiant etudiant = new Etudiant();
-    //         etudiant.setIne(ine);
-    //         etudiant.setPrenom(prenom);
-    //         etudiant.setNom(nom);
-    //         etudiant.setNiveau(niveau);
-    //         etudiant.setSexe(sexe);
-    //         etudiant.setFiliere(filiere);
-    //         etudiant.setDateNaiss(dateNaiss);
-    //         etudiantService.ajouterEtudiant(etudiant);
-
-    //         JOptionPane.showMessageDialog(this, "Étudiant ajouté avec succès!", "Succès",
-    //                 JOptionPane.INFORMATION_MESSAGE);
-    //     }
-    // }
 
     public void ajouterEtudiant() {
         String ine = ine_input.getText();
@@ -284,7 +263,7 @@ public class MainFrame extends JFrame {
         Sexe sexe = homme.isSelected() ? Sexe.MASCULIN : Sexe.FEMININ;
         String naiss = naiss_input.getText().trim(); // Récupérer la date sous forme de String
         LocalDate dateNaiss = null;
-    
+
         try {
             // Convertir la chaîne en LocalDate en spécifiant le format
             dateNaiss = LocalDate.parse(naiss);
@@ -293,10 +272,10 @@ public class MainFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Date invalide. Veuillez entrer la date au format yyyy-MM-dd.");
             return;
         }
-    
+
         Filiere filiere = filiereService.findByLibelle((String) filiereBox.getSelectedItem());
         Integer niveau = (Integer) niv_box.getSelectedItem();
-    
+
         if (ine.isEmpty() || nom.isEmpty() || prenom.isEmpty() || naiss.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs", "Erreur",
                     JOptionPane.ERROR_MESSAGE);
@@ -309,22 +288,13 @@ public class MainFrame extends JFrame {
             etudiant.setSexe(sexe);
             etudiant.setFiliere(filiere);
             etudiant.setDateNaiss(dateNaiss);
-            
+
             // Ajouter l'étudiant via le service
             etudiantService.ajouterEtudiant(etudiant);
-    
-            // Mettre à jour le modèle du tableau avec les nouvelles données
-            DefaultTableModel model = (DefaultTableModel) ((JTable) ((JScrollPane) ((JPanel) getContentPane().getComponent(1)).getComponent(0)).getViewport().getView()).getModel();
-            model.addRow(new Object[] {
-                etudiant.getIne(),
-                etudiant.getPrenom(),
-                etudiant.getNom(),
-                etudiant.getDateNaiss().toString(),
-                etudiant.getSexe().toString(),
-                etudiant.getFiliere().getLibelle(),
-                etudiant.getNiveau()
-            });
+
+            rafraichirTableau();
             reinitialiserFormulaire();
+
             JOptionPane.showMessageDialog(this, "Étudiant ajouté avec succès!", "Succès",
                     JOptionPane.INFORMATION_MESSAGE);
         }
@@ -340,6 +310,73 @@ public class MainFrame extends JFrame {
         filiereBox.setSelectedIndex(0);
         niv_box.setSelectedIndex(0);
     }
-    
-    
+
+    private void remplirFormulaireDepuisTableau() {
+        int selectedRow = etudiantTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            id_input.setText(etudiantTable.getValueAt(selectedRow, 0).toString());
+            ine_input.setText(etudiantTable.getValueAt(selectedRow, 1).toString());
+            prenom_input.setText(etudiantTable.getValueAt(selectedRow, 2).toString());
+            nom_input.setText(etudiantTable.getValueAt(selectedRow, 3).toString());
+            naiss_input.setText(etudiantTable.getValueAt(selectedRow, 4).toString());
+
+            // Gestion du sexe
+            String sexe = etudiantTable.getValueAt(selectedRow, 5).toString();
+            if (sexe.equalsIgnoreCase("MASCULIN")) {
+                homme.setSelected(true);
+            } else {
+                femme.setSelected(true);
+            }
+
+            // Sélection de la filière
+            String filiere = etudiantTable.getValueAt(selectedRow, 6).toString();
+            filiereBox.setSelectedItem(filiere);
+
+            // Sélection du niveau
+            int niveau = Integer.parseInt(etudiantTable.getValueAt(selectedRow, 7).toString());
+            niv_box.setSelectedItem(niveau);
+        }
+    }
+
+    private void supprimerEtudiant() {
+        int selectedRow = etudiantTable.getSelectedRow();
+
+        if (selectedRow >= 0) {
+            // Récupération de l'INE de l'étudiant sélectionné
+            String idString = etudiantTable.getValueAt(selectedRow, 0).toString();
+            int id = Integer.parseInt(idString);
+            String ine = etudiantTable.getValueAt(selectedRow, 1).toString();
+            String prenom = etudiantTable.getValueAt(selectedRow, 2).toString();
+            String nom = etudiantTable.getValueAt(selectedRow, 3).toString();
+
+            String message = String.format("Voulez-vous vraiment supprimer cet étudiant %d [ (%s) %s - %s ]?", id, ine, prenom, nom);
+            // Confirmation de suppression
+            int confirm = JOptionPane.showConfirmDialog(this,message,
+                    "Confirmation", JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Suppression dans la base de données ou la liste des étudiants
+                etudiantService.supprimer(id);
+
+                // Mise à jour du tableau
+                rafraichirTableau();
+
+                // Réinitialisation du formulaire
+                reinitialiserFormulaire();
+
+                JOptionPane.showMessageDialog(this, "Étudiant supprimé avec succès.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un étudiant à supprimer.");
+        }
+    }
+
+    private void rafraichirTableau() {
+        String data[][] = etudiantService.listerEtudiantsOnTable();
+        String column[] = { "#", "INE", "Prénom", "Nom", "Date Naissance", "Sexe", "Filière", "Niveau" };
+
+        DefaultTableModel model = new DefaultTableModel(data, column);
+        etudiantTable.setModel(model);
+    }
+
 }

@@ -1,6 +1,5 @@
 package sn.m1.uasz.tp3.service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import jakarta.persistence.EntityManager;
@@ -8,7 +7,6 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import sn.m1.uasz.tp3.dao.JpaUtil;
 import sn.m1.uasz.tp3.model.Etudiant;
-import sn.m1.uasz.tp3.model.Filiere;
 
 public class EtudiantService {
 
@@ -103,17 +101,18 @@ public class EtudiantService {
 
     public String[][] listerEtudiantsOnTable() {
         List<Etudiant> etudiants = listerEtudiants(); // ou votre méthode pour récupérer les étudiants
-        String[][] data = new String[etudiants.size()][7];
+        String[][] data = new String[etudiants.size()][8];
     
         for (int i = 0; i < etudiants.size(); i++) {
             Etudiant etudiant = etudiants.get(i);
-            data[i][0] = etudiant.getIne();
-            data[i][1] = etudiant.getPrenom();
-            data[i][2] = etudiant.getNom();
-            data[i][3] = etudiant.getDateNaiss() != null ? etudiant.getDateNaiss().toString() : "";
-            data[i][4] = etudiant.getSexe().toString();
-            data[i][5] = etudiant.getFiliere().getLibelle();
-            data[i][6] = String.valueOf(etudiant.getNiveau());
+            data[i][0] ="" + etudiant.getId();
+            data[i][1] = etudiant.getIne();
+            data[i][2] = etudiant.getPrenom();
+            data[i][3] = etudiant.getNom();
+            data[i][4] = etudiant.getDateNaiss() != null ? etudiant.getDateNaiss().toString() : "";
+            data[i][5] = etudiant.getSexe().toString();
+            data[i][6] = etudiant.getFiliere().getLibelle();
+            data[i][7] = String.valueOf(etudiant.getNiveau());
         }
     
         return data;
