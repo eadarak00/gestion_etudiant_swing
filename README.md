@@ -105,7 +105,7 @@ Une filière peut être supprimée, ce qui aura pour effet de dissocier les étu
 ![Interface principale](./screenshots/main.png)
 
 ### Ajout d'un étudiant
-![Ajout d'un étudiant](./screenshots/form.png)
+![Ajout d'un étudiant](./screenshots/fom.png)
 
 ### Liste des étudiants
 ![Liste des étudiants](./screenshots/list.png)
